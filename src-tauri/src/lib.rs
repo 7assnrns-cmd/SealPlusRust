@@ -56,10 +56,12 @@ pub async fn fetch_media_formats(url: String) -> Result<Vec<MediaFormat>, String
                     720 => format!("{}p (HD)", height),
                     _ => format!("{}p", height),
                 };
+                
+                // تصحيح مشكلة الـ semicolon والـ String return
                 note = if filesize > 0 && filesize < 20_000_000 {
                     "حجم أقل 📉".to_string()
                 } else {
-                    "أفضل جودة ✨".to_string();
+                    "أفضل جودة ✨".to_string()
                 };
             }
 
@@ -78,11 +80,10 @@ pub async fn fetch_media_formats(url: String) -> Result<Vec<MediaFormat>, String
     Ok(formats_list)
 }
 
-// دالة تهيئة Tauri (إن وجدت)
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![fetch_media_formats])
         .run(tauri::generate_context!())
-        .error(|e| eprintln!("error while running tauri application: {}", e));
+        .expect("error while running tauri application");
 }
