@@ -77,7 +77,6 @@ jobs:
         draft: true
         prerelease: false
         files: |
-          src-tauri/gen/android/app/build/outputs/apk/release/app-release-unsigned.apk
-          src-tauri/gen/android/app/build/outputs/apk/release/*.apk
+          src-tauri/gen/android/**/build/outputs/apk/**/*.apk
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
