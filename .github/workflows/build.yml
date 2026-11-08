@@ -34,14 +34,24 @@ jobs:
     - name: Install Tauri CLI & Dependencies
       run: npm install
 
-    - name: Ensure Icons Exist Automatically
+    - name: Generate Valid RGBA Icons Automatically
       run: |
-        mkdir -p src-tauri/icons
-        echo "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" | base64 -d > src-tauri/icons/icon.png
-        cp src-tauri/icons/icon.png src-tauri/icons/32x32.png
-        cp src-tauri/icons/icon.png src-tauri/icons/128x128.png
-        cp src-tauri/icons/icon.png src-tauri/icons/icon.ico
-        cp src-tauri/icons/icon.png src-tauri/icons/icon.icns
+        python3 -c "
+        import zlib, struct, os
+        os.makedirs(src-tauri/icons, exist_ok=True)
+        def make_png(w, h, c):
+            def chunk(tag, data):
+                return struct.pack('>I', len(data)) + tag + data + struct.pack('>I', zlib.crc32(tag + data) & 0xFFFFFFFF)
+            ihdr = struct.pack('>IIBBBBB', w, h, 8, 6, 0, 0, 0)
+            raw = b"".join(b'\x00' + bytes(c) * w for _ in range(h))
+            idat = zlib.compress(raw)
+            return b'\x89PNG\r\n\x1a\n' + chunk(b'IHDR', ihdr) + chunk(b'IDAT', idat) + chunk(b'IEND', b'')
+        
+        png_data = make_png(32, 32, (33, 150, 243, 255))
+        for name in [icon.png, 32x32.png, 128x128.png, icon.ico, icon.icns]:
+            with open(fsrc-tauri/icons/{name}, wb) as f:
+                f.write(png_data)
+        "
 
     - name: Initialize Tauri Android Project
       run: |
