@@ -1,6 +1,6 @@
 [package]
 name = "seal-plus-rust"
-version = "1.0.0"
+version = "0.1.0"
 description = "A fast video downloader app powered by Tauri and Rust"
 authors = ["Asta"]
 edition = "2021"
