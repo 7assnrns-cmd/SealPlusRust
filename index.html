@@ -13,7 +13,6 @@
         --text-main: #f4f4f6;
         --text-sub: #a0a0b2;
         --success-color: #2ea44f;
-        --error-color: #cf6679;
         --border-color: #2a2a3a;
       }
 
@@ -46,7 +45,7 @@
       header {
         text-align: center;
         margin-top: 12px;
-        margin-bottom: 8px;
+        margin-bottom: 4px;
       }
 
       header h1 {
@@ -86,13 +85,8 @@
         color: #fff;
         font-size: 15px;
         outline: none;
-        transition: border-color 0.2s;
         direction: ltr;
         text-align: left;
-      }
-
-      input[type="text"]:focus {
-        border-color: var(--accent-color);
       }
 
       .btn-group {
@@ -108,40 +102,18 @@
         font-size: 14px;
         font-weight: 700;
         cursor: pointer;
-        transition: transform 0.1s, background-color 0.2s;
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 6px;
       }
 
-      button:active {
-        transform: scale(0.97);
-      }
-
-      .btn-primary {
-        background: var(--accent-color);
-        color: #fff;
-      }
-
-      .btn-primary:hover {
-        background: var(--accent-hover);
-      }
-
-      .btn-success {
-        background: var(--success-color);
-        color: #fff;
-      }
-
-      .btn-secondary {
-        background: #2a2a3a;
-        color: var(--text-main);
-      }
+      .btn-primary { background: var(--accent-color); color: #fff; }
+      .btn-secondary { background: #2a2a3a; color: var(--text-main); }
 
       .format-selector {
         display: flex;
         gap: 10px;
-        margin-top: 4px;
       }
 
       .radio-label {
@@ -153,11 +125,6 @@
         text-align: center;
         font-size: 13px;
         cursor: pointer;
-        transition: all 0.2s;
-      }
-
-      .radio-label input {
-        display: none;
       }
 
       .radio-label.active {
@@ -173,7 +140,7 @@
         border: 1px solid var(--border-color);
         border-radius: 12px;
         padding: 12px;
-        max-height: 180px;
+        max-height: 140px;
         overflow-y: auto;
         font-family: monospace;
         font-size: 12px;
@@ -181,58 +148,143 @@
         direction: ltr;
         text-align: left;
         white-space: pre-wrap;
-        word-break: break-all;
       }
 
-      .spinner {
-        display: none;
-        width: 18px;
+      /* قسم حول التطبيق الجديد */
+      .section-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #d0bcff;
+        margin-bottom: 12px;
+      }
+
+      .setting-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .setting-item:last-child {
+        border-bottom: none;
+      }
+
+      .setting-info h4 {
+        font-size: 14px;
+        color: var(--text-main);
+      }
+
+      .setting-info p {
+        font-size: 12px;
+        color: var(--text-sub);
+        margin-top: 2px;
+      }
+
+      /* مفتاح التفعيل (Switch) */
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 46px;
+        height: 24px;
+      }
+
+      .switch input { opacity: 0; width: 0; height: 0; }
+
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-color: #2a2a3a;
+        transition: .3s;
+        border-radius: 24px;
+      }
+
+      .slider:before {
+        position: absolute;
+        content: "";
         height: 18px;
-        border: 2px solid rgba(255,255,255,0.3);
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: .3s;
         border-radius: 50%;
-        border-top-color: #fff;
-        animation: spin 0.8s linear infinite;
       }
 
-      @keyframes spin {
-        to { transform: rotate(360deg); }
+      input:checked + .slider { background-color: var(--accent-color); }
+      input:checked + .slider:before { transform: translateX(22px); }
+
+      .about-links {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-top: 12px;
       }
+
+      .link-card {
+        background: #121218;
+        border: 1px solid var(--border-color);
+        padding: 10px;
+        border-radius: 12px;
+        text-decoration: none;
+        color: var(--text-main);
+        font-size: 12px;
+        font-weight: 600;
+        text-align: center;
+        transition: background 0.2s;
+      }
+
+      .link-card:hover { background: rgba(103, 80, 164, 0.2); }
     </style>
   </head>
   <body>
     <div class="container">
       <header>
         <h1>Seal Plus Rust 🚀</h1>
-        <p>محرك التحميل السريع بآداء عالي وتصميم حديث</p>
+        <p>محرك تحميل الفيديوهات المطور بـ Rust</p>
       </header>
 
+      <!-- محرك التحميل -->
       <div class="card input-group">
         <input type="text" id="urlInput" placeholder="ألصق رابط الفيديو هنا..." />
 
         <div class="format-selector">
           <label class="radio-label active" id="lblVideo">
-            <input type="radio" name="format" value="video" checked /> 🎬 فيديو (Best)
+            <input type="radio" name="format" value="video" checked /> 🎬 فيديو
           </label>
           <label class="radio-label" id="lblAudio">
-            <input type="radio" name="format" value="audio" /> 🎵 صوت فقط (MP3)
+            <input type="radio" name="format" value="audio" /> 🎵 صوت (MP3)
           </label>
         </div>
 
         <div class="btn-group">
-          <button id="infoBtn" class="btn-secondary">
-            <span class="spinner" id="infoSpinner"></span>
-            <span>فحص الرابط 🔍</span>
-          </button>
-          <button id="downloadBtn" class="btn-primary">
-            <span class="spinner" id="dlSpinner"></span>
-            <span>بدء التحميل 📥</span>
-          </button>
+          <button id="infoBtn" class="btn-secondary">فحص 🔍</button>
+          <button id="downloadBtn" class="btn-primary">تحميل 📥</button>
         </div>
+
+        <div class="status-box" id="output">جاهز للاستخدام...</div>
       </div>
 
+      <!-- قسم حول التطبيق والتحديث التلقائي الخاص بك -->
       <div class="card">
-        <h4 style="font-size: 13px; color: var(--text-sub); margin-bottom: 8px;">سجل المعالجة والحالة:</h4>
-        <div class="status-box" id="output">جاهز لاستقبال الأوامر...</div>
+        <div class="section-title">حول التطبيق والتحديثات</div>
+        
+        <div class="setting-item">
+          <div class="setting-info">
+            <h4>التحديث التلقائي</h4>
+            <p>التحقق من التحديثات عبر مستودع GitHub</p>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="autoUpdateToggle" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="about-links">
+          <a href="https://github.com/7assnrns-cmd/SealPlusRust" target="_blank" class="link-card">📂 مستودع المشروع</a>
+          <a href="https://github.com/7assnrns-cmd/SealPlusRust/releases" target="_blank" class="link-card">🏷️ الإصدارات (Releases)</a>
+        </div>
       </div>
     </div>
 
@@ -243,14 +295,11 @@
       const outputEl = document.getElementById('output');
       const infoBtn = document.getElementById('infoBtn');
       const downloadBtn = document.getElementById('downloadBtn');
-      const infoSpinner = document.getElementById('infoSpinner');
-      const dlSpinner = document.getElementById('dlSpinner');
       
       const lblVideo = document.getElementById('lblVideo');
       const lblAudio = document.getElementById('lblAudio');
       let isAudioOnly = false;
 
-      // التبديل بين خيارات الصوت والفيديو
       lblVideo.addEventListener('click', () => {
         lblVideo.classList.add('active');
         lblAudio.classList.remove('active');
@@ -263,50 +312,25 @@
         isAudioOnly = true;
       });
 
-      function setLoading(btn, spinner, isLoading) {
-        btn.disabled = isLoading;
-        spinner.style.display = isLoading ? 'inline-block' : 'none';
-      }
-
-      // فحص جودة ومعلومات الفيديو
       infoBtn.addEventListener('click', async () => {
         const url = urlInput.value.trim();
-        if (!url) {
-          outputEl.textContent = '⚠️ الرجاء إدخال رابط الفيديو أولاً!';
-          return;
-        }
-        setLoading(infoBtn, infoSpinner, true);
-        outputEl.textContent = '🔄 جارٍ جلب البيانات عبر نواة Rust...';
-
+        if (!url) { outputEl.textContent = '⚠️ الرجاء إدخال الرابط أولاً!'; return; }
+        outputEl.textContent = '🔄 جارٍ فحص الرابط...';
         try {
           const res = await invoke('get_video_info', { url });
-          outputEl.textContent = '✅ معلومات الفيديو:\n' + res;
-        } catch (err) {
-          outputEl.textContent = '❌ خطأ: ' + err;
-        } finally {
-          setLoading(infoBtn, infoSpinner, false);
-        }
+          outputEl.textContent = res;
+        } catch (err) { outputEl.textContent = '❌ خطأ: ' + err; }
       });
 
-      // بدء عمل المحرك والتحميل
       downloadBtn.addEventListener('click', async () => {
         const url = urlInput.value.trim();
-        if (!url) {
-          outputEl.textContent = '⚠️ الرجاء إدخال رابط الفيديو أولاً!';
-          return;
-        }
-        setLoading(downloadBtn, dlSpinner, true);
-        outputEl.textContent = '⏳ جارٍ بدء التحميل والمعالجة...';
-
+        if (!url) { outputEl.textContent = '⚠️ الرجاء إدخال الرابط أولاً!'; return; }
+        outputEl.textContent = '⏳ جارٍ التحميل...';
         try {
           const outputPath = '/storage/emulated/0/Download';
           const res = await invoke('start_download', { url, outputPath, isAudioOnly });
-          outputEl.textContent = '🎉 تم التحميل بنجاح!\n' + res;
-        } catch (err) {
-          outputEl.textContent = '❌ خطأ في التحميل: ' + err;
-        } finally {
-          setLoading(downloadBtn, dlSpinner, false);
-        }
+          outputEl.textContent = '🎉 تم التحميل:\n' + res;
+        } catch (err) { outputEl.textContent = '❌ خطأ: ' + err; }
       });
     </script>
   </body>
