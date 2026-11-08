@@ -36,9 +36,9 @@ jobs:
 
     - name: Generate Valid RGBA Icons Automatically
       run: |
-        python3 -c "
+        cat << 'EOF' > generate_icons.py
         import zlib, struct, os
-        os.makedirs(src-tauri/icons, exist_ok=True)
+        os.makedirs('src-tauri/icons', exist_ok=True)
         def make_png(w, h, c):
             def chunk(tag, data):
                 return struct.pack('>I', len(data)) + tag + data + struct.pack('>I', zlib.crc32(tag + data) & 0xFFFFFFFF)
@@ -48,10 +48,11 @@ jobs:
             return b'\x89PNG\r\n\x1a\n' + chunk(b'IHDR', ihdr) + chunk(b'IDAT', idat) + chunk(b'IEND', b'')
         
         png_data = make_png(32, 32, (33, 150, 243, 255))
-        for name in [icon.png, 32x32.png, 128x128.png, icon.ico, icon.icns]:
-            with open(fsrc-tauri/icons/{name}, wb) as f:
+        for name in ['icon.png', '32x32.png', '128x128.png', 'icon.ico', 'icon.icns']:
+            with open(os.path.join('src-tauri/icons', name), 'wb') as f:
                 f.write(png_data)
-        "
+        EOF
+        python3 generate_icons.py
 
     - name: Initialize Tauri Android Project
       run: |
