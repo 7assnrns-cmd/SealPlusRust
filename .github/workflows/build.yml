@@ -134,8 +134,8 @@ jobs:
     - name: Create Release Draft & Upload Signed APK
       uses: softprops/action-gh-release@v2
       with:
-        tag_name: v0.1.0
-        name: "Seal Plus Rust v0.1.0 🚀"
+        tag_name: v0.1.1
+        name: "Seal Plus Rust v0.1.1 🚀"
         draft: true
         prerelease: false
         files: |
