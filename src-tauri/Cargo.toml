@@ -1,0 +1,15 @@
+[package]
+name = "seal-plus-rust"
+version = "1.0.0"
+description = "A fast video downloader app powered by Tauri and Rust"
+authors = ["Asta"]
+edition = "2021"
+
+[dependencies]
+tauri = { version = "2.0", features = [] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+[lib]
+name = "seal_plus_rust_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
