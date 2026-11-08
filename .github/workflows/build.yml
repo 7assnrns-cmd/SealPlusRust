@@ -26,9 +26,9 @@ jobs:
       with:
         node-version: '20'
 
-    - name: Install Rust target for Android
+    - name: Install Rust targets for Android
       run: |
-        rustup target add aarch64-linux-android
+        rustup target add aarch64-linux-android armv7-linux-androideabi x86_64-linux-android
 
     - name: Install Tauri CLI & Dependencies
       run: npm install
@@ -57,23 +57,26 @@ jobs:
       run: |
         echo "y" | npx tauri android init || true
 
-    - name: Build Android App (Tauri)
-      env:
-        ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-        ANDROID_ALIAS: ${{ secrets.ANDROID_ALIAS }}
-        ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+    - name: Build Android App (Tauri Universal)
       run: |
         if [ -f "src-tauri/gen/android/gradlew" ]; then
           chmod +x src-tauri/gen/android/gradlew
         fi
-        npx tauri android build --target aarch64
+        npx tauri android build
 
-    - name: List all APK files for debugging
+    - name: Sign APK with Auto-Generated Keystore
       run: |
-        echo "🔍 Searching for built APKs in Tauri paths:"
-        find src-tauri/gen/android -name "*.apk" -type f -exec ls -lh {} \;
+        sudo apt-get update && sudo apt-get install -y apksigner || true
+        keytool -genkey -v -keystore release.keystore -alias seal_key -keyalg RSA -keysize 2048 -validity 10000 -storepass password123 -keypass password123 -dname "CN=SealPlus, OU=Dev, O=Seal, L=Babil, C=IQ" || true
+        
+        # البحث عن ملف الـ APK المبني
+        APK_PATH=$(find src-tauri/gen/android -name "*.apk" | head -n 1)
+        if [ -f "$APK_PATH" ]; then
+          echo "Signing APK at: $APK_PATH"
+          $ANDROID_HOME/build-tools/34.0.0/apksigner sign --ks release.keystore --ks-key-alias seal_key --ks-pass pass:password123 --key-pass pass:password123 --out src-tauri/gen/android/app/build/outputs/apk/release/SealPlusRust-signed.apk "$APK_PATH"
+        fi
 
-    - name: Create Release Draft & Upload APK
+    - name: Create Release Draft & Upload Signed APK
       uses: softprops/action-gh-release@v2
       with:
         tag_name: v0.1.0
@@ -81,6 +84,6 @@ jobs:
         draft: true
         prerelease: false
         files: |
-          src-tauri/gen/android/app/build/outputs/apk/**/*.apk
+          src-tauri/gen/android/app/build/outputs/apk/release/SealPlusRust-signed.apk
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
