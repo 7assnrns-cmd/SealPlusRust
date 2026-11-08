@@ -20,9 +20,10 @@
         border-radius: 16px;
         margin-top: 20px;
         box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        text-align: right;
       }
       input {
-        width: 90%;
+        width: 100%;
         padding: 12px;
         margin: 10px 0;
         border-radius: 8px;
@@ -31,6 +32,7 @@
         color: #fff;
         font-size: 16px;
         outline: none;
+        box-sizing: border-box;
       }
       button {
         background: #6750a4;
@@ -42,6 +44,7 @@
         cursor: pointer;
         font-weight: bold;
         margin-top: 10px;
+        width: 100%;
       }
       button:active { background: #4f378b; }
       pre {
@@ -50,44 +53,64 @@
         border-radius: 8px;
         text-align: left;
         direction: ltr;
-        max-height: 180px;
+        max-height: 200px;
         overflow-y: auto;
         color: #0df;
-        font-size: 14px;
+        font-size: 13px;
         margin-top: 15px;
       }
     </style>
   </head>
   <body>
     <h1>Seal Plus (Rust Core) 🚀</h1>
-    <p>أسرع تطبيق تحميل فيديوهات مدعوم بنواة Rust</p>
+    <p>تطبيق تحميل الفيديوهات السريع</p>
 
     <div class="card">
-      <input type="text" id="urlInput" placeholder="ألصق رابط الفيديو هنا (YouTube, Insta...)" />
-      <br>
-      <button id="downloadBtn">اختبار المحرك / التحميل</button>
+      <label>رابط الفيديو:</label>
+      <input type="text" id="urlInput" placeholder="https://..." />
       
-      <h3 style="text-align: right; margin-top: 20px;">مخرجات التنفيذ:</h3>
+      <button id="infoBtn">فحص وجلب المعلومات 🔍</button>
+      <button id="downloadBtn" style="background: #2ea44f; margin-top: 8px;">بدء التحميل 📥</button>
+      
+      <h3 style="margin-top: 20px;">مخرجات العمليات:</h3>
       <pre id="output">جاهز لاستقبال الأوامر...</pre>
     </div>
 
     <script type="module">
       import { invoke } from '@tauri-apps/api/core';
 
+      const outputEl = document.getElementById('output');
+
+      // جلب معلومات الفيديو
+      document.getElementById('infoBtn').addEventListener('click', async () => {
+        const url = document.getElementById('urlInput').value.trim();
+        if (!url) {
+          outputEl.textContent = 'الرجاء إدخال الرابط أولاً!';
+          return;
+        }
+        outputEl.textContent = 'جارٍ جلب معلومات الفيديو عبر Rust...';
+        try {
+          const res = await invoke('get_video_info', { url });
+          outputEl.textContent = res;
+        } catch (err) {
+          outputEl.textContent = 'خطأ: ' + err;
+        }
+      });
+
+      // بدء التحميل
       document.getElementById('downloadBtn').addEventListener('click', async () => {
         const url = document.getElementById('urlInput').value.trim();
-        const outputEl = document.getElementById('output');
-        
-        outputEl.textContent = 'جارٍ إرسال الأمر إلى نواة Rust...';
-        
+        if (!url) {
+          outputEl.textContent = 'الرجاء إدخال الرابط أولاً!';
+          return;
+        }
+        outputEl.textContent = 'جارٍ بدء التحميل...';
         try {
-          // تجربة استدعاء دالة Rust وتنفيذ أمر (مثلاً فحص إصدار yt-dlp أو صدى الرابط)
-          const cmd = url ? `echo "جارٍ معالجة الرابط: ${url}" && (yt-dlp --version || echo "yt-dlp غير مضاف بمسار النظام بعد")` : 'yt-dlp --version';
-          
-          const response = await invoke('run_downloader_command', { commandStr: cmd });
-          outputEl.textContent = response;
-        } catch (error) {
-          outputEl.textContent = 'خطأ في التنفيذ: ' + error;
+          const outputPath = '/storage/emulated/0/Download';
+          const res = await invoke('start_download', { url, outputPath, isAudioOnly: false });
+          outputEl.textContent = 'تم التحميل بنجاح:\n' + res;
+        } catch (err) {
+          outputEl.textContent = 'خطأ في التحميل: ' + err;
         }
       });
     </script>
