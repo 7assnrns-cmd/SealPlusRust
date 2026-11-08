@@ -26,9 +26,9 @@ jobs:
       with:
         node-version: '20'
 
-    - name: Install Rust targets for Android
+    - name: Install Rust target for Android
       run: |
-        rustup target add aarch64-linux-android armv7-linux-androideabi x86_64-linux-android
+        rustup target add aarch64-linux-android
 
     - name: Install Tauri CLI & Dependencies
       run: npm install
@@ -57,19 +57,18 @@ jobs:
       run: |
         echo "y" | npx tauri android init || true
 
-    - name: Build Android App (Tauri Universal)
+    - name: Build Android App (Tauri)
       run: |
         if [ -f "src-tauri/gen/android/gradlew" ]; then
           chmod +x src-tauri/gen/android/gradlew
         fi
-        npx tauri android build
+        npx tauri android build --target aarch64
 
     - name: Sign APK with Auto-Generated Keystore
       run: |
-        sudo apt-get update && sudo apt-get install -y apksigner || true
-        keytool -genkey -v -keystore release.keystore -alias seal_key -keyalg RSA -keysize 2048 -validity 10000 -storepass password123 -keypass password123 -dname "CN=SealPlus, OU=Dev, O=Seal, L=Babil, C=IQ" || true
+        sudo apt-get update && sudo apt-get install -y apksigner Google-android-build-tools-installer || true
+        keytool -genkey -v -keystore release.keystore -alias seal_key -keyalg RSA -keysize 2048 -validity 10000 -storepass password123 -keypass password123 -dname "CN=SealPlus, OU=Dev, O=Seal, L=Babil, C=IQ"
         
-        # البحث عن ملف الـ APK المبني
         APK_PATH=$(find src-tauri/gen/android -name "*.apk" | head -n 1)
         if [ -f "$APK_PATH" ]; then
           echo "Signing APK at: $APK_PATH"
