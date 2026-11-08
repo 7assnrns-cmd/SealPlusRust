@@ -3,8 +3,7 @@ name: Build Android APK and Release
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -69,6 +68,11 @@ jobs:
         fi
         npx tauri android build --target aarch64
 
+    - name: List all APK files for debugging
+      run: |
+        echo "🔍 Searching for built APKs in Tauri paths:"
+        find src-tauri/gen/android -name "*.apk" -type f -exec ls -lh {} \;
+
     - name: Create Release Draft & Upload APK
       uses: softprops/action-gh-release@v2
       with:
@@ -77,6 +81,6 @@ jobs:
         draft: true
         prerelease: false
         files: |
-          src-tauri/gen/android/**/build/outputs/apk/**/*.apk
+          src-tauri/gen/android/app/build/outputs/apk/**/*.apk
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
