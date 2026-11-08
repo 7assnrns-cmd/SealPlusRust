@@ -34,6 +34,17 @@ jobs:
     - name: Install Tauri CLI & Dependencies
       run: npm install
 
+    - name: Ensure Icons Exist Automatically
+      run: |
+        mkdir -p src-tauri/icons
+        python3 -c "
+        import base64
+        b = base64.b64decode(iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+        for name in [icon.png, 32x32.png, 128x128.png, icon.ico, icon.icns]:
+            with open(fsrc-tauri/icons/{name}, wb) as f:
+                f.write(b)
+        "
+
     - name: Initialize Tauri Android Project
       run: |
         echo "y" | npx tauri android init || true
