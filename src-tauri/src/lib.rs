@@ -1,24 +1,3 @@
-mod downloader;
-
-#[tauri::command]
-fn start_download(url: String, output_path: String, is_audio_only: bool) -> Result<String, String> {
-    downloader::Downloader::download(&url, &output_path, is_audio_only)
-}
-
-#[tauri::command]
-fn get_video_info(url: String) -> Result<String, String> {
-    downloader::Downloader::get_info(&url)
-}
-
-#[cfg_attr(mobile, tauri::mobile_entry_point)]
-pub fn run() {
-    tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![start_download, get_video_info])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
-}
-
-
 use serde::{Deserialize, Serialize};
 use std::process::Command;
 
@@ -47,7 +26,7 @@ pub async fn fetch_media_formats(url: String) -> Result<Vec<MediaFormat>, String
 
     let stdout = String::from_utf8_lossy(&output.stdout);
     let json: serde_json::Value = serde_json::from_str(&stdout)
-        .map_err(|e| format!("خطأ في تحليل بيانات النواة: {}", e))?;
+        .map_err(|e| format!("فشل تحليل بيانات النواة: {}", e))?;
 
     let mut formats_list = Vec::new();
 
@@ -80,7 +59,7 @@ pub async fn fetch_media_formats(url: String) -> Result<Vec<MediaFormat>, String
                 note = if filesize > 0 && filesize < 20_000_000 {
                     "حجم أقل 📉".to_string()
                 } else {
-                    "أفضل جودة ✨".to_string()
+                    "أفضل جودة ✨".to_string();
                 };
             }
 
@@ -98,4 +77,12 @@ pub async fn fetch_media_formats(url: String) -> Result<Vec<MediaFormat>, String
     }
     Ok(formats_list)
 }
-    
+
+// دالة تهيئة Tauri (إن وجدت)
+#[cfg_attr(mobile, tauri::mobile_entry_point)]
+pub fn run() {
+    tauri::Builder::default()
+        .invoke_handler(tauri::generate_handler![fetch_media_formats])
+        .run(tauri::generate_context!())
+        .error(|e| eprintln!("error while running tauri application: {}", e));
+}
