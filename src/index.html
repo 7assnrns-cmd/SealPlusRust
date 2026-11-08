@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seal Plus Rust</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --accent: #d0bcff;
+            --text-main: #e6e1e5;
+            --text-secondary: #938f99;
+            --transition-speed: 0.4s;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+            padding: 16px;
+            overflow-x: hidden;
+            /* دعم السلاسة العالية */
+            will-change: transform;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 1.4rem;
+            color: var(--accent);
+            margin: 0;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            background: var(--card-bg);
+            color: var(--accent);
+            border: 1px solid rgba(208, 188, 255, 0.2);
+            padding: 8px 14px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.15s ease, background 0.2s;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        input {
+            flex: 1;
+            background: var(--card-bg);
+            border: 1px solid #333;
+            padding: 12px 16px;
+            border-radius: 16px;
+            color: var(--text-main);
+            font-size: 1rem;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: var(--accent);
+        }
+
+        /* حاوية القوائم (تتغير بين طولي وبطاقات بمرونة بدون قطع الأنيميشن) */
+        .media-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .media-container.grid-view {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 14px;
+        }
+
+        .media-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.2s;
+            will-change: transform, opacity;
+        }
+
+        .media-card:hover {
+            background: #252525;
+        }
+
+        .quality-title {
+            font-size: 1rem;
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            background: rgba(208, 188, 255, 0.1);
+            color: var(--accent);
+            padding: 4px 8px;
+            border-radius: 8px;
+            width: fit-content;
+            margin-top: 6px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Seal Plus 🚀</h1>
+        <div class="controls">
+            <button id="layoutToggleBtn" onclick="toggleLayout()">🔀 تبديل العرض</button>
+        </div>
+    </header>
+
+    <div class="input-group">
+        <input type="text" id="urlInput" placeholder="ألصق رابط الفيديو هنا...">
+        <button onclick="fetchFormats()">بحث</button>
+    </div>
+
+    <div id="mediaContainer" class="media-container">
+        <!-- العناصر ستظهر هنا ديناميكياً مع دعم 165Hz وحركات متصلة -->
+    </div>
+
+    <script>
+        let isGridView = false;
+
+        function toggleLayout() {
+            const container = document.getElementById('mediaContainer');
+            // استخدام Web Animations API لضمان استمرار الأنيميشن من النقطة الحالية دون إعادة للصفر
+            const firstRects = Array.from(container.children).map(el => el.getBoundingClientRect());
+
+            isGridView = !isGridView;
+            container.classList.toggle('grid-view', isGridView);
+
+            const lastRects = Array.from(container.children).map(el => el.getBoundingClientRect());
+
+            container.children.forEach && Array.from(container.children).forEach((el, index) => {
+                if(!firstRects[index]) return;
+                const dx = firstRects[index].left - lastRects[index].left;
+                const dy = firstRects[index].top - lastRects[index].top;
+
+                el.animate([
+                    { transform: `translate(${dx}px, ${dy}px)` },
+                    { transform: 'none' }
+                ], {
+                    duration: 400,
+                    easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)'
+                });
+            });
+        }
+
+        async function fetchFormats() {
+            const container = document.getElementById('mediaContainer');
+            container.innerHTML = '<p style="text-align:center; color:var(--text-secondary);">جاري تحليل الرابط واستخراج الجودات عبر النواة...</p>';
+            
+            // محاكاة البيانات القادمة من الـ Rust Backend للتأكد من مظهر البطاقات
+            setTimeout(() => {
+                const mockData = [
+                    { quality_label: "2160p (4K 🚀)", resolution: "3840x2160", note: "أفضل جودة ✨" },
+                    { quality_label: "1080p (60fps)", resolution: "1920x1080", note: "حجم أقل 📉" },
+                    { quality_label: "720p (HD)", resolution: "1280x720", note: "متوازن" },
+                    { quality_label: "128 kbps", resolution: "Audio Only", note: "صوت نقي 🎵" }
+                ];
+
+                container.innerHTML = '';
+                mockData.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'media-card';
+                    card.innerHTML = `
+                        <div>
+                            <div class="quality-title">${item.quality_label}</div>
+                            <div style="font-size:0.85rem; color:var(--text-secondary); margin-top:4px;">دقة: ${item.resolution}</div>
+                        </div>
+                        <div class="badge">${item.note}</div>
+                    `;
+                    container.appendChild(card);
+                });
+            }, 600);
+        }
+
+        // كشف تردد الشاشة ديناميكياً لدعم الـ High Refresh Rate (60Hz - 165Hz)
+        let lastTime = performance.now();
+        let frames = 0;
+        function detectRefreshRate(now) {
+            frames++;
+            if (now - lastTime >= 1000) {
+                console.log(`Detected Screen Refresh Rate approx: ${frames} Hz`);
+                frames = 0;
+                lastTime = now;
+            }
+            requestAnimationFrame(detectRefreshRate);
+        }
+        requestAnimationFrame(detectRefreshRate);
+    </script>
+</body>
+</html>
