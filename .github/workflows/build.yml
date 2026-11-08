@@ -112,7 +112,15 @@ jobs:
         if [ -f "src-tauri/gen/android/gradlew" ]; then
           chmod +x src-tauri/gen/android/gradlew
         fi
+        
+        # إعادة إنشاء مجلدات أندرويد لضمان تطابق اسم الباكيج com.seal.rust.app
+        rm -rf src-tauri/gen/android
+        npx tauri android init
+        if [ -f "src-tauri/gen/android/gradlew" ]; then
+          chmod +x src-tauri/gen/android/gradlew
+        fi
         npx tauri android build
+
 
     - name: Sign APK with Auto-Generated Keystore
       run: |
