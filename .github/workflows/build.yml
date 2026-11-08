@@ -26,9 +26,9 @@ jobs:
       with:
         node-version: '20'
 
-    - name: Install Rust target for Android
+    - name: Install Rust targets for Android
       run: |
-        rustup target add aarch64-linux-android
+        rustup target add aarch64-linux-android armv7-linux-androideabi x86_64-linux-android
 
     - name: Install Tauri CLI & Dependencies
       run: npm install
@@ -57,22 +57,30 @@ jobs:
       run: |
         echo "y" | npx tauri android init || true
 
-    - name: Build Android App (Tauri)
+    - name: Build Android App (Tauri Universal)
       run: |
         if [ -f "src-tauri/gen/android/gradlew" ]; then
           chmod +x src-tauri/gen/android/gradlew
         fi
-        npx tauri android build --target aarch64
+        npx tauri android build
 
     - name: Sign APK with Auto-Generated Keystore
       run: |
-        sudo apt-get update && sudo apt-get install -y apksigner Google-android-build-tools-installer || true
         keytool -genkey -v -keystore release.keystore -alias seal_key -keyalg RSA -keysize 2048 -validity 10000 -storepass password123 -keypass password123 -dname "CN=SealPlus, OU=Dev, O=Seal, L=Babil, C=IQ"
         
-        APK_PATH=$(find src-tauri/gen/android -name "*.apk" | head -n 1)
+        # استخدام المسار الدقيق للـ APK الـ Universal الناتج من Tauri
+        APK_PATH="src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-unsigned.apk"
+        OUTPUT_PATH="src-tauri/gen/android/app/build/outputs/apk/universal/release/SealPlusRust-signed.apk"
+        
         if [ -f "$APK_PATH" ]; then
           echo "Signing APK at: $APK_PATH"
-          $ANDROID_HOME/build-tools/34.0.0/apksigner sign --ks release.keystore --ks-key-alias seal_key --ks-pass pass:password123 --key-pass pass:password123 --out src-tauri/gen/android/app/build/outputs/apk/release/SealPlusRust-signed.apk "$APK_PATH"
+          # العثور على أداة apksigner داخل Android SDK تلقائياً
+          APKSIGNER=$(find $ANDROID_HOME/build-tools -name "apksigner" | head -n 1)
+          $APKSIGNER sign --ks release.keystore --ks-key-alias seal_key --ks-pass pass:password123 --key-pass pass:password123 --out "$OUTPUT_PATH" "$APK_PATH"
+          echo "Successfully signed APK!"
+        else
+          echo "Error: Unsigned APK not found at $APK_PATH"
+          exit 1
         fi
 
     - name: Create Release Draft & Upload Signed APK
@@ -83,6 +91,6 @@ jobs:
         draft: true
         prerelease: false
         files: |
-          src-tauri/gen/android/app/build/outputs/apk/release/SealPlusRust-signed.apk
+          src-tauri/gen/android/app/build/outputs/apk/universal/release/SealPlusRust-signed.apk
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
