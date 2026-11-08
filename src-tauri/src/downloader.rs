@@ -24,4 +24,22 @@ impl Downloader {
             Err(e) => Err(format!("فشل تشغيل محرك التحميل: {}", e)),
         }
     }
+
+    pub fn get_info(url: &str) -> Result<String, String> {
+        let yt_dlp_binary = "yt-dlp";
+        let output = Command::new(yt_dlp_binary)
+            .args(["--dump-json", url])
+            .output();
+
+        match output {
+            Ok(res) => {
+                if res.status.success() {
+                    Ok(String::from_utf8_lossy(&res.stdout).to_string())
+                } else {
+                    Err(String::from_utf8_lossy(&res.stderr).to_string())
+                }
+            }
+            Err(e) => Err(format!("فشل جلب معلومات الفيديو: {}", e)),
+        }
+    }
 }
