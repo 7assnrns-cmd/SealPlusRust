@@ -28,7 +28,7 @@ impl Downloader {
     pub fn get_info(url: &str) -> Result<String, String> {
         let yt_dlp_binary = "yt-dlp";
         let output = Command::new(yt_dlp_binary)
-            .args(["--dump-json", url])
+            .args(["--dump-json", "--no-playlist", url])
             .output();
 
         match output {

@@ -139,8 +139,8 @@
           </label>
         </div>
         <div class="about-links">
-          <a href="https://github.com/7assnrns-cmd/SealPlusRust" target="_blank" class="link-card">مستودع المشروع</a>
-          <a href="https://github.com/7assnrns-cmd/SealPlusRust/releases" target="_blank" class="link-card">الإصدارات</a>
+          <a href="https://github.com/7assnrns-cmd/SealPlusRust" target="_blank" class="link-card">📂 مستودع المشروع</a>
+          <a href="https://github.com/7assnrns-cmd/SealPlusRust/releases" target="_blank" class="link-card">🏷️ الإصدارات</a>
         </div>
       </div>
     </div>
@@ -204,8 +204,7 @@
         try {
           const outputPath = "/storage/emulated/0/Download";
           const res = await invoke("start_download", { url, outputPath, isAudioOnly });
-          outputEl.textContent = "🎉 تم التحميل بنجاح:
-" + res;
+          outputEl.textContent = "🎉 تم التحميل بنجاح:\n" + res;
         } catch (err) {
           outputEl.textContent = "❌ خطأ في التحميل: " + err;
         }
