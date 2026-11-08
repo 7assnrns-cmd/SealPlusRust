@@ -35,7 +35,7 @@ jobs:
       run: npm install
 
     - name: Initialize Tauri Android Project
-      run: npx tauri android init --force || true
+      run: npx tauri android init --yes
 
     - name: Build Android App (Tauri)
       env:
