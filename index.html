@@ -4,11 +4,92 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Seal Plus Rust</title>
+    <style>
+      body {
+        background: #121212;
+        color: #e0e0e0;
+        font-family: sans-serif;
+        padding: 20px;
+        text-align: center;
+        margin: 0;
+      }
+      h1 { color: #d0bcff; }
+      .card {
+        background: #1e1e1e;
+        padding: 20px;
+        border-radius: 16px;
+        margin-top: 20px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+      }
+      input {
+        width: 90%;
+        padding: 12px;
+        margin: 10px 0;
+        border-radius: 8px;
+        border: 1px solid #444;
+        background: #2b2b2b;
+        color: #fff;
+        font-size: 16px;
+        outline: none;
+      }
+      button {
+        background: #6750a4;
+        color: #fff;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        font-weight: bold;
+        margin-top: 10px;
+      }
+      button:active { background: #4f378b; }
+      pre {
+        background: #111;
+        padding: 12px;
+        border-radius: 8px;
+        text-align: left;
+        direction: ltr;
+        max-height: 180px;
+        overflow-y: auto;
+        color: #0df;
+        font-size: 14px;
+        margin-top: 15px;
+      }
+    </style>
   </head>
   <body>
-    <div id="app" style="font-family: sans-serif; text-align: center; margin-top: 50px; background: #121212; color: #fff; height: 100vh; padding: 20px;">
-      <h1>Seal Plus (Rust Core) 🚀</h1>
-      <p>جاهز لبناء أسرع تطبيق تحميل فيديوهات بلغة Rust!</p>
+    <h1>Seal Plus (Rust Core) 🚀</h1>
+    <p>أسرع تطبيق تحميل فيديوهات مدعوم بنواة Rust</p>
+
+    <div class="card">
+      <input type="text" id="urlInput" placeholder="ألصق رابط الفيديو هنا (YouTube, Insta...)" />
+      <br>
+      <button id="downloadBtn">اختبار المحرك / التحميل</button>
+      
+      <h3 style="text-align: right; margin-top: 20px;">مخرجات التنفيذ:</h3>
+      <pre id="output">جاهز لاستقبال الأوامر...</pre>
     </div>
+
+    <script type="module">
+      import { invoke } from '@tauri-apps/api/core';
+
+      document.getElementById('downloadBtn').addEventListener('click', async () => {
+        const url = document.getElementById('urlInput').value.trim();
+        const outputEl = document.getElementById('output');
+        
+        outputEl.textContent = 'جارٍ إرسال الأمر إلى نواة Rust...';
+        
+        try {
+          // تجربة استدعاء دالة Rust وتنفيذ أمر (مثلاً فحص إصدار yt-dlp أو صدى الرابط)
+          const cmd = url ? `echo "جارٍ معالجة الرابط: ${url}" && (yt-dlp --version || echo "yt-dlp غير مضاف بمسار النظام بعد")` : 'yt-dlp --version';
+          
+          const response = await invoke('run_downloader_command', { commandStr: cmd });
+          outputEl.textContent = response;
+        } catch (error) {
+          outputEl.textContent = 'خطأ في التنفيذ: ' + error;
+        }
+      });
+    </script>
   </body>
 </html>
